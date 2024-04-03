@@ -45,7 +45,22 @@ namespace BlazorQuiz.Server.Controllers
             return Ok(uploadedMedia);
         }
 
-       
+        // Retrieves media data based on the provided GUID
+
+        [HttpGet("{guid}")]
+        public async Task<IActionResult> GetMedia(Guid guid)
+        {
+
+            var mediaData = await _mediaService.GetMediaByIdAsync(guid);
+
+            MediaViewModel returnMedia = new()
+            {
+                Type = mediaData.Type,
+                Path = mediaData.Path
+            };
+
+            return Ok(returnMedia);
+        }
 
     }
 }
