@@ -50,7 +50,17 @@
         </nav>
     </header>
 
-  
+    <div class="container">
+        <partial name="_CookieConsentPartial" optional />
+        <main role="main" class="pb-1" align="center">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="footer border-top pl-3 text-muted">
+        <div class="container">
+            &copy; 2024 BlazorQuiz</a>
+        </div>
+    </footer>
 
     <environment include="Development">
         <script src="~/Identity/lib/jquery/dist/jquery.js"></script>
