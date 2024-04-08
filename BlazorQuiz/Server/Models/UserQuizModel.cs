@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorQuiz.Server.Models
 
-    // Fixad
 {
     public class UserQuizModel
     {

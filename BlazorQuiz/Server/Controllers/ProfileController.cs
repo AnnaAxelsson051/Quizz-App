@@ -2,8 +2,6 @@
 using BlazorQuiz.Server.Services;
 using BlazorQuiz.Server.Interfaces;
 
-// Fixad
-
 namespace BlazorQuiz.Server.Controllers
 {
     [Route("api/[controller]")]

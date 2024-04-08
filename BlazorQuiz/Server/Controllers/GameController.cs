@@ -3,7 +3,6 @@ using BlazorQuiz.Server.Interfaces;
 using BlazorQuiz.Shared.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-// Fixad
 
 namespace BlazorQuiz.Server.Controllers
 {

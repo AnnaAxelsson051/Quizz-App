@@ -2,8 +2,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using IdentityModel;
 
-// Fixad
-
 namespace BlazorQuiz.Server.Models
 {
     public class QuizModel

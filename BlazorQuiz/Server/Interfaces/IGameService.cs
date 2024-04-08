@@ -2,8 +2,6 @@
 using BlazorQuiz.Shared.ViewModels;
 using BlazorQuiz.Server.Models.ViewModels;
 
-// Fixad
-
 namespace BlazorQuiz.Server.Interfaces
 {
     public interface IGameService

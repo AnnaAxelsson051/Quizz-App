@@ -3,8 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-// Fixad
-
 namespace BlazorQuiz.Server.Models
 {
     public class QuestionModel

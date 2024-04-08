@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorQuiz.Server.Models
 {
-    // Fixad
     // Representing media entities
 
     public class MediaModel
@@ -20,7 +19,7 @@ namespace BlazorQuiz.Server.Models
         [ForeignKey("User")]
         public string UserRefId { get; set; }
 
-        // To access associated ApplicationUser entity,for navigation from
+        // To access associated ApplicationUser entity, for navigation from
         // media items to their resp users
         public virtual ApplicationUser User { get; set; }
     }
