@@ -136,7 +136,83 @@
     // adds a new question to the quizList based on provided settings,
     // resets the form, and updates relevant options and state
 
+    private async Task AddQuestion()
+    {
+        var newQuestionViewModel = new NewQuestionViewModel(quiz);
 
+        if (options.MediaQuestion)
+        {
+            newQuestionViewModel.QuizImageUrl = quiz.QuizImageUrl;
+        }
+
+        quizList.Add(newQuestionViewModel);
+
+        await form.ResetAsync();
+        options.HasQuestion = true;
+        options.ResetToDefault();
+        quiz.ResetToDefault();
+        StateHasChanged();
+
+    }
+
+    // calculates and returns the time in minutes and seconds
+    // based on the input seconds parameter and the state of
+    // the options object timer
+
+    private string FormatTimerDuration(double seconds)
+    {
+        string formattedDuration;
+        if (options.Timer > 59)
+        {
+            int min = (int)options.Timer / 60;
+            int sec = (int)options.Timer % 60;
+
+
+            formattedDuration = $"{min} {(options.Timer == 60 ? "minute" : $"minutes {sec} seconds")}";
+
+        }
+        else
+        {
+
+            formattedDuration = $"{options.Timer} seconds";
+        }
+
+        return formattedDuration;
+    }
+
+    // clones a NewQuestionViewModel object, adds it to list,
+    // sets options and triggers state change
+
+    private void AddQuestionToQuiz(NewQuestionViewModel questionViewModel)
+    {
+        var newQuestionViewModelClone = new NewQuestionViewModel
+        {
+            Question = questionViewModel.Question,
+            Answer1 = questionViewModel.Answer1,
+            Answer2 = questionViewModel.Answer2,
+            Answer3 = questionViewModel.Answer3,
+            Answer4 = questionViewModel.Answer4,
+            QuizImageUrl = questionViewModel.QuizImageUrl,
+            QuizImageFullPath = questionViewModel.QuizImageFullPath,
+            CorrectAnswer = questionViewModel.Answer1
+
+        };
+
+        quizList.Add(newQuestionViewModelClone);
+        options.HasQuestion = true;
+        options.ResetToDefault();
+        StateHasChanged();
+    }
+
+    // resets the game state by calling the NewGame method
+    // on the options object and clearing the quizList
+
+    private async Task ResetQuizState()
+    {
+        options.NewGame();
+        quizList = new List<NewQuestionViewModel>();
+
+    }
     
 
 }
