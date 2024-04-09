@@ -1,0 +1,17 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+    <MudAppBar Color="Color.Primary">
+        <MudSpacer />
+        <LoginDisplay />
+    </MudAppBar>
+    <MudMainContent>
+            @Body
+    </MudMainContent>
+</MudLayout>
+
+
