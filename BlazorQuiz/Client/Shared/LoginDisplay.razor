@@ -1,0 +1,30 @@
+﻿<!-- provides logout button for authenticated users,
+    using authentication services and navigation
+    to log out user from the app  Fixad-->
+
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject SignOutSessionStateManager SignOutManager
+@inject NavigationManager Navigation
+
+<AuthorizeView>
+    <Authorized>
+        <MudLink Href="/" Underline="Underline.None" Color=Color.Inherit>Home</MudLink>
+        <MudSpacer />
+        <MudSpacer />
+        <MudButton Color="Color.Secondary" @onclick="SignOut" Variant="Variant.Filled">Sign out</MudButton>
+    </Authorized>
+</AuthorizeView>
+
+@code{
+
+    // initiates sign-out process for user by setting the
+    // sign-out state and navigating to logout endpoint
+
+    private async Task SignOut(MouseEventArgs args)
+    {
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+}
