@@ -1,0 +1,18 @@
+﻿<!-- Navigates to the root URL of the application after a delay of 2 seconds,
+    injected with the NavigationManager to handle navigation,
+    and includes a RemoteAuthenticatorView component for authentication purposes-->
+
+@page "/authentication/{action}"
+@inject NavigationManager _navigationManager
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+<RemoteAuthenticatorView Action="@Action" />
+
+@code{
+    [Parameter] public string? Action { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(2000);
+        _navigationManager.NavigateTo("/");
+    }
+}
