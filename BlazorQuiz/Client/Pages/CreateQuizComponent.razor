@@ -1,0 +1,142 @@
+﻿<!-- component for creating quizzes with configurable settings and
+    multiple-choice questions, enabling users to dynamically add questions,
+    reset the quiz configuration, and share the created quiz via URL
+
+    Fixad-->
+
+@page "/createquiz"
+@using MudBlazor
+@using BlazorQuiz.Client.Pages.NewQuizComponents;
+@using System.Text.Json;
+@using BlazorQuiz.Shared.ViewModels
+@using Models;
+@using System.Text;
+@using System.Net.Http.Headers;
+@inject NavigationManager _nav
+
+@inject HttpClient _http
+
+
+<div class="align-center ma-3 d-flex justify-center">
+
+    <MudGrid Class="d-flex justify-center align-center">
+        <MudText Typo="Typo.h4">Create a New Quiz</MudText>
+        @if (!String.IsNullOrEmpty(options.QuizGuid))
+        {
+
+            <ShareGame ShareId="@shareId" OnReset="ResetQuizState" />
+
+        }
+        else
+        {
+
+
+            <MudItem Class="d-flex justify-center align-center" xs="10">
+                <MudPaper Class="pa-10 d-block" Width="450px">
+                    <MudText Typo="Typo.h5">Settings</MudText>
+                    <MudTextField RequiredError="Add a title!" Label="Quiz Title" @bind-Value="options.QuizTitle" For="@(() => options.QuizTitle)" T="string" Immediate="true" Required="true" />
+
+                    <MudToggleIconButton Title="Off" @bind-Toggled="@options.HasTimer"
+                                         Icon="@Icons.Material.Filled.AlarmOff"
+                                         ToggledIcon="@Icons.Material.Filled.AlarmOn" Color="@Color.Error" ToggledColor="@Color.Success" ToggledTitle="On" />
+
+                    <span>Question time limit @(options.HasTimer ? FormatTimerDuration(options.Timer) : "Off")</span>
+
+                    <MudSlider Step="15" Min="15" Max="120" Disabled="@(!options.HasTimer)" @bind-Value="options.Timer" Color="@(options.HasTimer ? Color.Success : Color.Dark)" />
+
+                </MudPaper>
+            </MudItem>
+
+            <MudItem Class="d-flex align-center justify-center" xs="10">
+                <MudPaper Width="450px" Class="d-block pa-12">
+                    <MudExpansionPanels>
+
+
+                        @options.QuizTitle
+                        @foreach (var item in quizList)
+                        {
+                            <MudExpansionPanel @key="item.Question" Text="" MaxHeight="150">
+                                <TitleContent>
+                                    <div class="d-flex">
+
+                                        <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Color="@Color.Primary" Class="mr-3"></MudIcon>
+
+                                        <MudText><strong>@item.Question</strong></MudText>
+                                    </div>
+                                </TitleContent>
+                                <ChildContent>
+
+                                    Correct answer: <b>
+                                        @item.CorrectAnswer
+                                        @if (!string.IsNullOrEmpty(item.QuizImageFullPath) && item.QuizImageFullPath.Contains("image"))
+                                        {
+
+                                            <MudImage Src="@item.QuizImageFullPath" Alt="@($"Image for question: {item.Question}")" Elevation="25" Class="rounded-lg d-block mt-3" Width="100" />
+                                        }
+                                    </b>
+                                </ChildContent>
+                            </MudExpansionPanel>
+
+
+                        }
+
+                    </MudExpansionPanels>
+                    <MudText Typo="Typo.h5">Add a question</MudText>
+
+                    <QuizForm quiz="@quiz" options="@options" OnAddQuestion="AddQuestionToQuiz" />
+
+                </MudPaper>
+            </MudItem>
+
+            <MudButton OnClick="CreateAndPostQuizAsync" Disabled="@(!options.HasQuestion || string.IsNullOrEmpty(options.QuizTitle))" Variant="Variant.Filled" Color="Color.Primary">Create Quiz</MudButton>
+        }
+    </MudGrid>
+</div>
+
+
+@code {
+    private MudTheme Theme = new MudTheme();
+    private NewQuestionViewModel quiz = new NewQuestionViewModel();
+    private List<NewQuestionViewModel> quizList = new List<NewQuestionViewModel>();
+    private QuizOptions options = new QuizOptions(); //Set of settings to make the quiz work
+    MudForm? form;
+    string url = "";
+    string shareId = "";
+
+    // creates a new quiz model and sets its properties based on user input
+    // and options, sends it to the server-side API to create a new quiz
+    // and updates relevant variables with the response data
+
+    private async Task CreateAndPostQuizAsync()
+    {
+        var newQuizViewModel = new NewQuizViewModel()
+        {
+            Title = options.QuizTitle,
+            Questions = quizList,
+        };
+
+        if (options.HasTimer)
+        {
+            newQuizViewModel.Timer = (int)options.Timer;
+        }
+        else
+        {
+            newQuizViewModel.Timer = 0;
+        }
+
+        var response = await _http.PostAsJsonAsync($"api/game/create", newQuizViewModel);
+
+        var newQuizViewModelResponse = await response.Content.ReadFromJsonAsync<NewQuizViewModel>();
+        options.QuizGuid = newQuizViewModelResponse.PublicId;
+        url = $"{_nav.BaseUri}game/{newQuizViewModelResponse.PublicId}";
+        shareId = newQuizViewModelResponse.PublicId;
+
+    }
+
+    // adds a new question to the quizList based on provided settings,
+    // resets the form, and updates relevant options and state
+
+
+    
+
+}
