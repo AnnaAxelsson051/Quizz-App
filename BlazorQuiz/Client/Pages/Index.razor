@@ -1,0 +1,54 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject NavigationManager _navigationManager
+
+<PageTitle>Index</PageTitle>
+
+
+<AuthorizeView>
+	<Authorized>
+		<div class="d-flex align-center justify-center">
+            <MudItem xs="12" Class="d-flex align-center justify-center" style="padding-top: 1vh">
+                <MudButton Style="width: 200px; height: 80px; margin: 20px;" Variant="Variant.Filled" Color="Color.Secondary" OnClick="JoinQuiz">I would like to join a Quiz</MudButton>
+                <MudButton Style="width: 200px; height: 80px; margin: 20px;" Variant="Variant.Filled" Color="Color.Secondary" OnClick="ViewQuiz">View all Quizzes</MudButton>
+                <MudButton Style="width: 200px; height: 80px; margin: 20px;" Variant="Variant.Filled" Color="Color.Secondary" OnClick="CreateQuiz">Let me create a new Quiz!</MudButton>
+            </MudItem>
+		</div>
+	</Authorized>
+    <NotAuthorized>
+        <h1 class="align-center justify-center" style="margin: 90px 30px 0 30px;">Ultimate Quizz App</h1>
+
+        <div class="d-flex align-center justify-center">
+
+
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code{
+    private void ViewQuiz()
+    {
+        _navigationManager.NavigateTo("/myquizzes");
+    }
+    private void CreateQuiz()
+    {
+        _navigationManager.NavigateTo("/createquiz");
+    }
+    private void JoinQuiz()
+    {
+        _navigationManager.NavigateTo("/joinquiz");
+    }
+    private void Register()
+    {
+        _navigationManager.NavigateTo(" authentication/register");
+    }
+    private void Login()
+    {
+        _navigationManager.NavigateTo(" authentication/login");
+    }
+
+
+}
+
