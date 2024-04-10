@@ -1,0 +1,36 @@
+﻿<!-- Allows users to join a quiz by entering a quiz link, they
+    can start the quiz by clicking a button which navigates them to
+    game page associated with the quiz link
+
+    Fixad-->
+
+@page "/joinquiz"
+
+@using Microsoft.AspNetCore.Http;
+@using BlazorQuiz.Shared.ViewModels;
+
+@inject HttpClient _http
+@inject NavigationManager _navigationManager
+
+<div class="justify-center align-center d-flex ma-3">
+    <MudGrid Class="justify-center align-center d-flex">
+        <MudText Typo="Typo.h4">Participate in Quiz</MudText>
+        <MudItem xs="12" Class="justify-center align-center d-flex">
+            <MudPaper Width="450px" Class="pa-10 d-block">
+                <MudText Typo="Typo.h5">Take a Quiz</MudText>
+                <MudTextField T="string" Label="Enter Quiz link" @bind-Value="gameId" For="@(() => gameId)" Required="true" RequiredError="Enter quiz link!" />
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" Class="justify-center align-center d-flex">
+            <MudButton Style="width: 185px; height: 95px;" Color="Color.Primary" OnClick="StartQuiz">Let me start this Quiz!</MudButton>
+        </MudItem>
+    </MudGrid>
+</div>
+
+@code {
+    string? gameId;
+    private void StartQuiz()
+    {
+        _navigationManager.NavigateTo($"/game/{gameId}");
+    }
+}
