@@ -275,5 +275,96 @@ else
         isGameFinished = true;
         StateHasChanged();
     }
+// Sends a guess made by the player to the server-side API for validation
+    // and checks whether guess is correct
+    // Then adds a clone of the guess to the list of guesses made during the quiz session
+
+    private async Task CheckGuessAndRecord(GuessCheckViewModel guess)
+    {
+        var guessResponse = await _httpClient.PostAsJsonAsync($"api/game/guess", guess);
+        isCorrect = await guessResponse.Content.ReadFromJsonAsync<bool>();
+        var guessCheckViewModelClone = new GuessCheckViewModel()
+        {
+            Guess = guess.Guess,
+            GuessId = guess.GuessId,
+            Seconds = guess.Seconds
+        };
+        guesses.Add(guessCheckViewModelClone);
+    }
+
+
+
+    // Changes the color of the answer option to indicate a
+    // wrong/right answer in the quiz interface
+
+    private async Task SetOptionColorWrong(int choice)
+    {
+        await Task.Run(() =>
+        {
+            switch (choice)
+            {
+                case 1:
+                    alt1 = wrong;
+                    break;
+                case 2:
+                    alt2 = wrong;
+                    break;
+                case 3:
+                    alt3 = wrong;
+                    break;
+                case 4:
+                    alt4 = wrong;
+                    break;
+            }
+        });
+    }
+
+    private async Task SetOptionColorCorrect(int choice)
+    {
+        await Task.Run(() =>
+        {
+            switch (choice)
+            {
+                case 1:
+                    alt1 = success;
+                    break;
+                case 2:
+                    alt2 = success;
+                    break;
+                case 3:
+                    alt3 = success;
+                    break;
+                case 4:
+                    alt4 = success;
+                    break;
+            }
+        });
+    }
+
+
+
+    // Resets color
+
+    private async Task ResetOptionColor(int choice)
+    {
+        await Task.Run(() =>
+        {
+            switch (choice)
+            {
+                case 1:
+                    alt1 = primary;
+                    break;
+                case 2:
+                    alt2 = primary;
+                    break;
+                case 3:
+                    alt3 = primary;
+                    break;
+                case 4:
+                    alt4 = primary;
+                    break;
+            }
+        });
+    }
 
 }
