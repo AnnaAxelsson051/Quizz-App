@@ -12,7 +12,16 @@
         <MudText Typo="Typo.h4">Your Quizzes</MudText>
         <MudItem Class="justify-center d-flex align-center" xs="12">
             <MudPaper Width="450px">
-          
+                <MudList Clickable="true">
+                    @foreach (var item in createdQuizList)
+                    {
+                        <MudListItem Style="border: solid 1px black; margin-bottom: 3px;">
+                            <MudLink Class="justify-center align-center d-flex " Href='@string.Format($"/myquizzes/{item.PublicId.ToString()}")' Color=Color.Inherit Underline="Underline.None">@item.Name</MudLink>
+
+                        </MudListItem>
+
+                    }
+                </MudList>
             </MudPaper>
         </MudItem>
     </MudGrid>
