@@ -1,0 +1,50 @@
+﻿<!-- Displays player scores for a specific quiz identified by a public ID,
+    fetching data from the server-side API and rendering it
+
+    Fixad-->
+
+@page "/myquizzes/{publicid}"
+@using Microsoft.AspNetCore.Http;
+@using BlazorQuiz.Shared.ViewModels
+@inject HttpClient _http
+@inject NavigationManager _navigationManager
+
+<div class="align-center justify-center ma-3 d-flex ">
+    <MudGrid Class="justify-center d-flex align-center" Style="  flex-direction: column;">
+        <MudText Typo="Typo.h4">Player Scores</MudText>
+        <MudText>
+            Share code: @publicid
+
+        </MudText>
+        <MudItem xs="12" Class="justify-center d-flex align-center">
+            <MudPaper Width="450px">
+                <MudList Clickable="true">
+                    @foreach (var item in userList)
+                    {
+                        <MudItem Style="border: solid 1px black; margin-bottom: 3px; ">
+                            <MudListItem>
+                                Player name: @item.User
+                            </MudListItem>
+                            <MudListItem>
+                                Player score: @item.Score
+                            </MudListItem>
+                        </MudItem>
+                    }
+                </MudList>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</div>
+
+@code {
+    [Parameter]
+    public string publicid { get; set; }
+
+    List<UserQuizViewModel>? userList = new List<UserQuizViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await _http.GetAsync($"api/profile/myquizzes/{publicid}");
+        userList = await response.Content.ReadFromJsonAsync<List<UserQuizViewModel>>();
+    }
+}
