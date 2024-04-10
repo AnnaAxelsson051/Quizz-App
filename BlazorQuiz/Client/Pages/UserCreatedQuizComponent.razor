@@ -1,0 +1,29 @@
+﻿<!-- displays a list of quizzes created by user,
+    allowing them to navigate to each quiz details
+    by clicking on it   Fixad-->
+
+@page "/myquizzes"
+@using BlazorQuiz.Shared.ViewModels
+@inject HttpClient _http
+@inject NavigationManager _navigationManager
+
+<div class="justify-center align-center ma-3 d-flex ">
+    <MudGrid Class="d-flex align-center justify-center">
+        <MudText Typo="Typo.h4">Your Quizzes</MudText>
+        <MudItem Class="justify-center d-flex align-center" xs="12">
+            <MudPaper Width="450px">
+          
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</div>
+
+@code {
+    List<UserCreatedQuizViewModel>? createdQuizList = new List<UserCreatedQuizViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await _http.GetAsync("api/profile/myquizzes");
+        createdQuizList = await response.Content.ReadFromJsonAsync<List<UserCreatedQuizViewModel>>();
+    }
+}
