@@ -1,0 +1,279 @@
+﻿<!-- component responsible for presenting quiz questions, collecting user
+    responses, and displaying the final score, dynamically loading
+    quiz data based on the provided ID
+-->
+
+@page "/game/{id}"
+@using MudBlazor
+@using BlazorQuiz.Shared.ViewModels;
+@using System.Text.Json;
+@using System.Text;
+@using System.Net.Http.Headers;
+@inject HttpClient _httpClient
+
+
+@if (isGameFinished == true)
+{
+    <div class="justify-center d-flex ma-3 align-center">
+        <p style="padding-top:150px">Your final score: @score</p>
+    </div>
+}
+else if (quizData.questions != null)
+{
+    <div class="d-flex align-center ma-3 justify-center">
+        <MudGrid Class="d-flex justify-center align-center" Style="max-width: 600px">
+            <MudText Typo="Typo.h4">@quizData.title</MudText>
+
+            <MudItem Class="d-flex align-center justify-center" xs="10">
+                <MudGrid>
+                    <MudItem xs="12" Class="d-flex align-center justify-center">
+                        <MudCard Style="width: 70vw; overflow: hidden; max-width: 550px;">
+
+                            @if (@media[count].Path.Contains("image"))
+                            {
+                                <MudCardMedia Image="@media[count].Path" Height="290" />
+                            }
+                            else if (@media[count].Path.Contains("video"))
+                            {
+                                <_PlayVideo VideoPath="@media[count].Path" VideoType="@media[count].Type" ShowVideo=true />
+                            }
+
+
+                            <MudCardContent>
+                                <MudText Class="justify-center align-center d-flex" Typo="Typo.h5">@quizData.questions[count].Question</MudText>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+            @if (hasTimer)
+            {
+
+                <MudProgressLinear Color="@(currentTimer < timerStart / 2 ? Color.Secondary : Color.Primary )" Min="0" Max="@timerStart" Value="@currentTimer" Class="my-7" Striped="true" Size="Size.Large" />
+            }
+            <MudItem xs="12" Class="justify-center align-center d-flex" Style="max-width: 70vw">
+                <MudGrid>
+                    <MudItem xs="6" Class="justify-center align-center d-flex">
+                        <MudButton OnClick="() => ProcessAnswerSubmission(quizData.questions[count].Answer1, 1)" Color="@alt1" Class="d-flex justify-center align-center py-8 mud-width-full" Variant="Variant.Filled">@quizData.questions[count].Answer1</MudButton>
+                    </MudItem>
+                    <MudItem xs="6" Class="justify-center align-center d-flex">
+                        <MudButton OnClick="() => ProcessAnswerSubmission(quizData.questions[count].Answer2, 2)" Color="@alt1" Class="d-flex justify-center align-center py-8 mud-width-full" Variant="Variant.Filled">@quizData.questions[count].Answer2</MudButton>
+                    </MudItem>
+                    <MudItem xs="6" Class="justify-center align-center d-flex">
+                        <MudButton OnClick="() => ProcessAnswerSubmission(quizData.questions[count].Answer3, 3)" Color="@alt1" Class="d-flex justify-center align-center py-8 mud-width-full" Variant="Variant.Filled">@quizData.questions[count].Answer3</MudButton>
+                    </MudItem>
+                    <MudItem xs="6" Class="justify-center align-center d-flex">
+                        <MudButton OnClick="() => ProcessAnswerSubmission(quizData.questions[count].Answer4, 4)" Color="@alt1" Class="d-flex justify-center align-center py-8 mud-width-full" Variant="Variant.Filled">@quizData.questions[count].Answer4</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+        </MudGrid>
+    </div>
+}
+else
+{
+    <div class="d-flex align-center justify-center ma-3">
+        <p style="padding-top:180px">loading...</p>
+    </div>
+}
+
+
+
+
+@code {
+
+    [Parameter]
+    public string id { get; set; }
+
+    GameQuizViewModel quizData = new GameQuizViewModel();
+    List<MediaViewModel> media = new List<MediaViewModel>();
+    GuessCheckViewModel guess = new GuessCheckViewModel();
+    List<GuessCheckViewModel> guesses = new List<GuessCheckViewModel>();
+
+    int timerStart;
+    int currentTimer;
+    int count = 0;
+    int score;
+    bool hasTimer = false;
+    bool isCorrect;
+    bool isGameFinished = false;
+    bool stoppTimer = false;
+
+    MudBlazor.Color alt1 { get; set; } = Color.Primary;
+    MudBlazor.Color alt2 { get; set; } = Color.Primary;
+    MudBlazor.Color alt3 { get; set; } = Color.Primary;
+    MudBlazor.Color alt4 { get; set; } = Color.Primary;
+
+    MudBlazor.Color primary = Color.Primary;
+    MudBlazor.Color wrong = Color.Error;
+    MudBlazor.Color success = Color.Success;
+
+    // Initializes the component async by fetching quiz data from API endpoint
+    // Processing the questions and associated media and initiating countdown
+
+    protected override async Task OnInitializedAsync()
+    {
+        var gameResponse = await _httpClient.PostAsJsonAsync($"api/game/newgame/{id}", id);
+        quizData = await gameResponse.Content.ReadFromJsonAsync<GameQuizViewModel>();
+
+        var quizQuestions = quizData.questions;
+        var MediaViewModelClone = new MediaViewModel();
+
+        foreach (var question in quizQuestions)
+        {
+            var mediaReference = question.QuizMediaUrl;
+            if (mediaReference == "00000000-0000-0000-0000-000000000000")
+            {
+                MediaViewModelClone = new MediaViewModel()
+                {
+                    Type = "",
+                    Path = ""
+                };
+            }
+
+            else
+            {
+                var mediaResponse = await _httpClient.GetAsync($"api/media/{mediaReference}");
+                var mediaObject = await mediaResponse.Content.ReadFromJsonAsync<MediaViewModel>();
+                MediaViewModelClone = new MediaViewModel()
+                {
+                    Type = mediaObject.Type,
+                    Path = mediaObject.Path
+                };
+
+            }
+            media.Add(MediaViewModelClone);
+        }
+        InitializeTimer();
+    }
+
+    private async Task InitializeTimer()
+    {
+        if (quizData.timer > 0)
+        {
+            hasTimer = true;
+            timerStart = quizData.timer * 10;
+            currentTimer = quizData.timer * 10;
+
+            do
+            {
+                await Task.Delay(100);
+
+                currentTimer -= 1;
+                StateHasChanged();
+            }
+            while (currentTimer > 0 && !stoppTimer);
+
+            if (currentTimer == 0)
+            {
+                await ProcessAnswerSubmission();
+            }
+        }
+    }
+
+    // Handles submission of user answers during a quiz, updating timers,
+    // checking correctness, and displaying feedback
+    // progressing through questions or submitting the quiz upon completion
+
+    private async Task ProcessAnswerSubmission(string answer = "", int alternativ = -1)
+    {
+        stoppTimer = true;
+        guess.Guess = answer;
+        guess.GuessId = quizData.questions[count].Id;
+
+        if (hasTimer)
+        {
+            guess.Seconds = CalculateElapsedTimeInSeconds();
+        }
+        await CheckGuessAndRecord(guess);
+
+        if (alternativ == -1)
+        {
+            await HighlightWrongAnswersAndTimeout();
+        }
+        else
+        {
+            if (isCorrect == true)
+            {
+                await SetOptionColorCorrect(alternativ);
+                StateHasChanged();
+            }
+            else
+            {
+                await SetOptionColorWrong(alternativ);
+                StateHasChanged();
+            }
+            await Task.Delay(3000);
+            await ResetOptionColor(alternativ);
+            StateHasChanged();
+        }
+        if (count < quizData.questions.Count - 1)
+        {
+            count++;
+            RestartTimer();
+
+            StateHasChanged();
+        }
+        else
+            await SubmitQuizAndProcessResult();
+    }
+
+    // Highlights the wrong answers by changing their color and then introduces
+    // a timeout delay before resetting the colors back to their default state
+
+    private async Task HighlightWrongAnswersAndTimeout()
+    {
+        for (int i = 1; i <= 4; i++)
+        {
+            await SetOptionColorWrong(i);
+            StateHasChanged();
+        }
+        await Task.Delay(3000);
+        for (int i = 1; i <= 4; i++)
+        {
+            await ResetOptionColor(i);
+            StateHasChanged();
+
+        }
+    }
+
+
+
+    // Calculates the time elapsed in seconds based on difference between
+    // initial timer value and current timer value div by 10
+
+    private int CalculateElapsedTimeInSeconds()
+    {
+        int remainingTime = (int)Math.Ceiling(currentTimer / 10m);
+
+        int elapsedTime = (timerStart / 10) - remainingTime;
+
+        return elapsedTime;
+    }
+
+    private void RestartTimer()
+    {
+        stoppTimer = false;
+        currentTimer = timerStart;
+        InitializeTimer();
+    }
+
+
+    // Submits the quiz result, updates score, marks the game as finished
+    // and triggers a UI update
+
+    private async Task SubmitQuizAndProcessResult()
+    {
+        SubmitQuizViewModel submitQuiz = new()
+        {
+            gameId = quizData.gameId,
+            guesses = this.guesses
+        };
+
+        var response = await _httpClient.PutAsJsonAsync($"api/game/gameresult", submitQuiz);
+        score = await response.Content.ReadFromJsonAsync<int>();
+        isGameFinished = true;
+        StateHasChanged();
+    }
+
+}
