@@ -1,0 +1,39 @@
+﻿<!-- sets up routing and auth handling,
+    redirecting unauth users to login page and display
+    Not found for invalid routes  Fixad-->
+
+@inject NavigationManager _navigationManager
+
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    @if (context.User.Identity?.IsAuthenticated != true)
+                    {
+                        <RedirectToLogin />
+                    }
+                    else
+                    {
+                        <p role="alert">Im sorry, a user needs authorization to view this content</p>
+                    }
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>The page was not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">This is an empty page &nbsp;</p>
+                <p>
+                    <b>
+                        @_navigationManager.Uri.Replace(_navigationManager.BaseUri, "")
+                    </b>
+                </p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+
