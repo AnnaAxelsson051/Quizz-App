@@ -1,0 +1,24 @@
+﻿@using BlazorQuiz.Shared.ViewModels;
+<MudItem xs="12" Class="d-flex align-center justify-center">
+    <MudPaper Width="500px" Class="d-block pa-12">
+        <MudText Typo="Typo.h5">The quiz was successfully created!</MudText>
+        <MudText Typo="Typo.h6">If you want to share it share the below code</MudText>
+        <MudText>The recipient can then take the quiz by selecting the <b>Join quiz</b> option</MudText>
+
+        <MudTextField @ref="Ref" T="string" Label="Share Code" Variant="Variant.Outlined" Text="@ShareId" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Api" OnAdornmentClick="@(() => Ref.SelectAsync())" />
+    </MudPaper>
+</MudItem>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ResetGame">Create another quiz</MudButton>
+
+@code {
+    [Parameter] public EventCallback OnReset { get; set; }
+    [Parameter] public string ShareId { get; set; }
+    public MudTextField<string> Ref { get; set; }
+
+
+
+    private async Task ResetGame()
+    {
+        await OnReset.InvokeAsync(null); ;
+    }
+}
