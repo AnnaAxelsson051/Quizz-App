@@ -1,0 +1,64 @@
+﻿@using BlazorQuiz.Shared.ViewModels
+@using Models
+@inject HttpClient _http
+@inject NavigationManager _nav
+
+<MudForm Model="quiz" @ref="form" @bind-IsValid="@options.IsValidated">
+    <MudTextField T="string" Label="Question" @bind-Value="quiz.Question" For="@(() => quiz.Question)" Required="true" RequiredError="Add a quetsion!" />
+    <MudTextField Variant="Variant.Outlined" T="string" Label="Correct answer" @bind-Value="quiz.Answer1" For="@(() => quiz.Answer1)" Required="true" RequiredError="Required" />
+    <MudTextField T="string" Label="Incorrect answer 1" @bind-Value="quiz.Answer2" For="@(() => quiz.Answer2)" Required="true" RequiredError="Required" />
+    <MudTextField T="string" Label="Incorrect answer 2" @bind-Value="quiz.Answer3" For="@(() => quiz.Answer3)" Required="true" RequiredError="Required" />
+    <MudTextField Immediate="true" T="string" Label="Incorrect answer 3" @bind-Value="quiz.Answer4" For="@(() => quiz.Answer4)" Required="true" RequiredError="Required" OnChange="@(()=>form.Validate())" />
+    <MudExpansionPanels Class="mt-3">
+        <MudExpansionPanel>
+            <TitleContent>
+                <div class="d-flex">
+                    <MudIcon Icon="@Icons.Material.Filled.Settings" class="mr-3"></MudIcon>
+                    <MudText>Question options</MudText>
+                </div>
+            </TitleContent>
+            <ChildContent>
+                <MudToggleIconButton @bind-Toggled="@options.MediaQuestion"
+                                     Icon="@Icons.Material.Filled.ImageNotSupported" Color="@Color.Error" Title="Off"
+                                     ToggledIcon="@Icons.Material.Filled.Image" ToggledColor="@Color.Success" ToggledTitle="On" />
+
+                <span>@(options.MediaQuestion ? "This is a media question" : "This is a text question")</span>
+
+
+                <_Upload OnFileUpload="OnFileUploaded" IsActive="@options.MediaQuestion" />
+            </ChildContent>
+
+        </MudExpansionPanel>
+    </MudExpansionPanels>
+
+</MudForm>
+<div class="d-flex justify-content-center w-100 mt-3">
+
+    <MudTooltip Text="Add" Class="mt-3 align-self-center ">
+
+        <MudFab Disabled="@(!(options.IsValidated && (!options.MediaQuestion || (options.MediaQuestion && !string.IsNullOrEmpty(quiz.QuizImageUrl)))))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddQuestion" />
+    </MudTooltip>
+</div>
+
+@code {
+    [Parameter] public EventCallback<NewQuestionViewModel> OnAddQuestion { get; set; }
+    [Parameter] public QuizOptions options { get; set; }
+    [Parameter] public NewQuestionViewModel quiz { get; set; }
+
+
+    private MudForm form;
+
+    private async Task AddQuestion()
+    {
+        await OnAddQuestion.InvokeAsync(quiz);
+        await form.ResetAsync();
+    }
+    private void OnFileUploaded(NewMediaViewModel media)
+    {
+        //Helper function to work with _Upload
+
+        quiz.QuizImageUrl = media.guid;
+        quiz.QuizImageFullPath = media.path;
+        StateHasChanged();
+    }
+}
