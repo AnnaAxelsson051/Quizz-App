@@ -1,0 +1,29 @@
+﻿<!-- displays a video player with button that toggles
+    visibility of the video  Fixad-->
+
+<MudCard Style="height: 320px; width: 100%; overflow: hidden">
+    @if (!ShowVideo)
+    {
+        <MudCardContent Style="flex; flex-wrap: wrap; justify-content: center; align-items: center; width: 95%; height: 95%; display:">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="(() => ShowVideo = true)">Play Video</MudButton>
+        </MudCardContent>
+    }
+
+    <video loop="true" playsinline="" autoplay="@(ShowVideo)" style="height: auto; width: 95%;" hidden="@(!ShowVideo)" >
+        <source src=@VideoSource type=@VideoMimeType>
+        The video tag is not supported by the browser
+    </video>
+
+</MudCard>
+
+@code {
+    [Parameter]
+    public string VideoSource { get; set; } = "/videos/e53cd43c-555e-4a3e-a056-6a74d087df26.mp4";
+    [Parameter]
+    public string VideoMimeType { get; set; } = "video/mp4";
+
+    [Parameter]
+    public bool ShowVideo { get; set; } = false;
+}
+
+
