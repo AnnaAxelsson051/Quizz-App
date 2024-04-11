@@ -1,0 +1,67 @@
+﻿<!-- allows users to upload files, triggering an event callback if
+    successful upload, with error handling and feedback messages displayed  Fixad-->
+
+@inject ISnackbar Snackbar;
+@inject HttpClient _httpClient
+@using System.Text.Json;
+@using BlazorQuiz.Shared.ViewModels;
+@using System.Net.Http.Headers;
+
+
+<MudFileUpload Accept=".png, .jpg, .jpeg, .gif, .mp4" FilesChanged="UploadFile" T="IBrowserFile" Disabled="@(!IsActive)">
+    <ButtonTemplate>
+        <MudFab HtmlTag="label"
+                StartIcon="@Icons.Material.Filled.CloudUpload"
+                Color="Color.Primary"
+                Label="Upload a file"
+                for="@context" />
+    </ButtonTemplate>
+</MudFileUpload>
+
+
+@code {
+
+    [Parameter]
+    public EventCallback<NewMediaViewModel> OnFileUpload { get; set; }
+    [Parameter]
+    public bool IsActive { get; set; }
+
+    IBrowserFile file;
+
+
+    bool fileUploaded = false;
+
+    // handles the upload of file to the server, including setting up
+    // HTTP request, processing server response
+    // providing user feedback via Snackbar component
+
+    private async Task UploadFile(IBrowserFile file)
+    {
+        fileUploaded = true;
+        var multipartFormDataContent = new MultipartFormDataContent();
+        var fileStream = file.OpenReadStream(maxAllowedSize: 13 * 1024 * 1024);
+
+        var streamContent = new StreamContent(fileStream);
+        streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+        multipartFormDataContent.Add(streamContent, "file", file.Name);
+
+        this.file = file;
+        var response = await _httpClient.PostAsync("api/media", multipartFormDataContent);
+        var json = await response.Content.ReadAsStringAsync();
+
+        if ((int)response.StatusCode != 200)
+        {
+            Snackbar.Add(json, Severity.Error);
+
+            return;
+        }
+        var newMediaViewModel = JsonSerializer.Deserialize<NewMediaViewModel>(json);
+
+        await OnFileUpload.InvokeAsync(newMediaViewModel);
+        Snackbar.Add("Saved!", Severity.Success);
+        await Task.Delay(2000);
+        fileUploaded = false;
+    }
+
+
+}

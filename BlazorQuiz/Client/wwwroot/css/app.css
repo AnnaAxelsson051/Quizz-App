@@ -1,0 +1,73 @@
+﻿
+/* Fixad */
+
+@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+
+html, body {
+    font-family: 'Roboto', Helvetica, Arial, sans-serif;
+}
+
+.blazor-error-boundary {
+    background: #ffb6c1 no-repeat 1rem/1.8rem, #ffb6c1;
+    color: white;
+    padding: 1rem;
+}
+
+    .blazor-error-boundary::after {
+        content: "There was an error"
+    }
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #4682b4;
+}
+
+.invalid {
+    outline: 1px solid red;
+}
+
+.validation-message {
+    color: darkorange;
+}
+
+.content {
+    padding-top: 2rem;
+}
+
+#blazor-error-ui {
+    background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: none;
+    width: 100%;
+    z-index: 1000;
+    padding: 1rem 1.5rem;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+
+h1:focus {
+    outline: none;
+}
+
+a, .btn-link {
+    text-decoration: none;
+    transition: color 0.3s ease;
+    color: #4CAF50;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #ff7f50;
+    border-color: #ff6347;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
