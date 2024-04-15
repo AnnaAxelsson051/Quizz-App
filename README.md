@@ -1,8 +1,12 @@
 # Ultimate Quizz App
 
+---
+
 ## UI
 
 ![User interface](Quizz-app-user-interface.png)
+
+---
 
 ## Description
 
