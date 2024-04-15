@@ -21,7 +21,9 @@ This is a full-stack quiz application built with Blazor and ASP.NET Core where u
 
 ## Architecture
 
-The app is abstracted into Controller, IService and Service-layers which compartmentalizes responsibilities and enhances maintainability of code. Data is transmitted from the server to the Razor client via shared view models, which makes communication effective and prevents exposure of data. Client side logic is implemented using Blazor and the app has a user-friendly interface that offers intuitive navigation. The database schema is implemented using Entity framework core with migrations and code first.
+The app is abstracted into Controller, IService and Service-layers which compartmentalizes responsibilities and enhances maintainability of code. Data is transmitted from the server to the Razor client via shared view models, which makes communication effective and prevents exposure of data. 
+
+Client side logic is implemented using Blazor and the app has a user-friendly interface that offers intuitive navigation. The database schema is implemented using Entity framework core with migrations and code first.
 
 ## User experience, design, performance and scalability
 
