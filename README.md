@@ -26,7 +26,8 @@ The app is abstracted into Controller, IService and Service-layers which compart
 ## User experience, design, performance and scalability
 
 The app has a user-friendly interface design which makes it easy for users to create, publish and participate in quizzes. Users also have great flexibility in creating their quizzes, with the ability to add images and videos to questions, set time limits and choose answer options. 
-<br>
+
+
 The architectural choice from Controller to IGameService to GameService streamlines code management and promotes scalability. Abstraction layers are effective when it comes to ensuring maintainability, scalability and code reusability. By encapsulating various components within abstraction layers such as services housed in a Services folder and corresponding interfaces (IServices) in an Interface folder the application has a modular and organized design. (This separation also follows the Interface Segregation Principle (ISP) of SOLID design principles.) This makes it easier for developers to maintain, extend and optimize the application's functionality in the future without compromising its integrity. Abstraction layers also creates effective integration of business logic and data access. 
 <br>
 The database design built with EF core with migrations promotes scalability and is able to handle increasing data volumes and user traffic over time.
